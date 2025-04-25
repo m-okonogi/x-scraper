@@ -1,0 +1,35 @@
+name: Weekday Twitter Scraper
+
+on:
+  schedule:
+    - cron: "0 0 * * 1-5" # 平日9:00 JST（＝ 0:00 UTC）
+  workflow_dispatch: # 手動実行も可
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Decode and save Google credentials
+        run: |
+          echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" | base64 --decode > credentials.json
+        shell: bash
+
+      - name: Run script
+        env:
+          BEARER_TOKEN_2: ${{ secrets.BEARER_TOKEN_2 }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_APPLICATION_CREDENTIALS: credentials.json
+        run: python main.py
