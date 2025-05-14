@@ -14,14 +14,10 @@ BEARER_TOKEN = os.getenv('BEARER_TOKEN_2')
 # スプレッドシートの認証設定
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 
-# GitHub Actions で credentials.json を作成（Base64形式から）
-google_creds_base64 = os.getenv("GOOGLE_CREDENTIALS_JSON")
-if google_creds_base64:
-    with open("credentials.json", "wb") as f:
-        f.write(base64.b64decode(google_creds_base64))
-    credentials_file = "credentials.json"
-else:
-    credentials_file = "xscraper-457604-69659ff09a28.json"  # ローカル用
+credentials_file = "credentials.json"
+# ローカルで実行する場合
+if not os.path.exists(credentials_file):
+    credentials_file = "xscraper-457604-69659ff09a28.json"
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(credentials_file, scope)
 client = gspread.authorize(credentials)
